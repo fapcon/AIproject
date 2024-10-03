@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package api;
+
+import "google/protobuf/empty.proto";
+
+
+option go_package = ".;api";
+
+service APIService {
+  rpc SubscribeInstruments (Instruments) returns (google.protobuf.Empty);
+  rpc UnsubscribeInstruments (Instruments) returns (google.protobuf.Empty);
+  rpc ModifyNameResolvers (Instruments) returns (google.protobuf.Empty);
+  rpc ModifyInstrumentDetails (InstrumentDetails) returns (google.protobuf.Empty);
+}
+
+message Instruments {
+  repeated Instrument instruments = 1;
+}
+
+message InstrumentDetails {
+  repeated InstrumentDetail instrument_details = 1;
+}
+
+message Instrument {
+  Exchange Exchange = 1;
+  string LocalSymbol = 2;
+  string ExchangeSymbol = 3;
+}
+
+message InstrumentDetail {
+  Exchange Exchange = 1;
+  string LocalSymbol = 2;
+  string ExchangeSymbol = 3;
+  int32 PricePrecision = 4;
+  int32 SizePrecision = 5;
+  float MinLot = 6;
+}
+
+enum Exchange {
+  ExchangeUnknown = 0;
+  ExchangeOKX = 1;
+}

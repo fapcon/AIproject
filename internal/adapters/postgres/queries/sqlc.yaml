@@ -1,0 +1,19 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema:
+      - "../../../../migrations/quant"
+    queries:
+      - "./name_resolvers.sql"
+      - "./instrument_details.sql"
+    gen:
+      go:
+        package: "queries"
+        out: "."
+        sql_package: "pgx/v4"
+        emit_exported_queries: true
+        overrides:
+          - db_type: "pg_catalog.numeric"
+            go_type:
+              import: "github.com/shopspring/decimal"
+              type: "Decimal"

@@ -1,0 +1,6 @@
+local:
+    dialect: postgres
+    datasource: postgres://postgres:postgres@localhost:5432/torque?sslmode=disable&TimeZone=UTC&application_name=quant
+    dir: ./migrations/quant/
+    table: migrations
+    schema: quant

@@ -1,0 +1,25 @@
+image: golang:1.22.0
+
+stages:
+  - lint
+  - test
+
+before_script:
+  - go mod tidy
+
+test:
+  stage: test
+  script:
+    - go test ./... -v
+  only:
+    - master
+    - merge_requests
+
+lint:
+  stage: lint
+  script:
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.56.2
+    - golangci-lint run ./...
+  only:
+    - master
+    - merge_requests

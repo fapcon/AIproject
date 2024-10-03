@@ -1,0 +1,373 @@
+syntax = "proto3";
+
+option go_package = "./piston";
+
+
+service Piston {
+  rpc ConnectMDGateway(stream MarketdataMessage) returns (stream MarketdataMessage) {}
+  rpc ConnectTradingGateway(stream TradingMessage) returns (stream TradingMessage) {}
+}
+
+enum OrderSide {
+  UNKNOWN = 0;
+  BID = 1;
+  ASK = 2;
+}
+
+enum AggrSide {
+  MAKER = 0;
+  TAKER = 1;
+}
+
+enum OrderType {
+  UNKNOWN_TYPE = 0;
+  LIMIT = 1;
+  POST_ONLY = 2;
+  MARKET = 3;
+  LIMIT_FOK = 4;
+  LIMIT_IOC = 5;
+  MARKET_FOK = 6;
+  MARKET_IOC = 7;
+}
+
+enum OrderStatus {
+  NONE = 0;
+  NEW = 1;
+  OPENED = 2;
+  PENDING_CANCEL = 3;
+  CANCELLED = 4;
+  REJECTED_CANCEL = 5;
+  PENDING_MOVE = 6;
+  MOVED = 7;
+  FILL = 8;
+  DONE = 9;
+  REJECTED = 10;
+  INTERNAL_ERROR = 11;
+  REJECTED_MOVE = 12;
+}
+
+enum MarketdataMsgType {
+  DISCONNECT = 0;
+  SUBSCRIBE = 2;
+  BOOK = 3;
+}
+
+message SubscribeMessage
+{
+  repeated string instruments = 1;
+}
+
+message BookMessage
+{
+  OrderBookSnapshot book = 1;
+}
+
+message MarketdataMessage
+{
+  MarketdataMsgType msgType = 1;
+
+  oneof message {
+    SubscribeMessage subscribeMessage = 12;
+    BookMessage bookMessage = 13;
+  }
+}
+
+enum TradingMessageType {
+  UnknownTradingMessageType = 0;
+  RequestBalance = 1;
+  ExchangeBalancesResponse = 2;
+  ExchangePositionsResponse = 3;
+  RequestTradeHistory = 4;
+  TradeHistoryResponse = 5;
+  OpenOrdersResponse = 6;
+  RequestOpenOrders = 7;
+  RateLimitExceedError = 8;
+  RequestInstrumentsDetails = 9;
+  InstrumentsDetailsResponse = 10;
+
+  AddOrderRequest = 21;
+  OrderAddedResponse = 22;
+  OrderAddRejectedResponse = 23;
+
+  MoveOrderRequest = 24;
+  OrderMovedResponse = 25;
+  OrderMoveRejectedResponse = 26;
+
+  CancelOrderRequest = 27;
+  OrderCancelledResponse = 28;
+  OrderCancelRejectedResponse = 29;
+
+  OrderFilledResponse = 31;
+  OrderExecutedResponse = 32;
+
+  CancelAllRequest = 33;
+}
+
+message RateLimitExceedMsg {}
+
+message TradingMessage {
+  TradingMessageType type = 1;
+
+  oneof data {
+    ExchangeBalances balances = 102;
+    OpenOrdersRequestResult openOrders = 106;
+    OpenOrdersRequest openOrdersRequest = 107;
+    RateLimitExceedMsg rateLimitExceed = 108;
+
+    InstrumentsDetailsRequest instrumentsDetailsRequest = 109;
+    InstrumentsDetails instrumentsDetailsResponse = 110;
+
+    AddOrder addOrder = 121;
+    OrderAdded orderAdded = 122;
+    OrderAddRejected orderAddRejected = 123;
+
+    MoveOrder moveOrder = 124;
+    OrderMoved orderMoved = 125;
+    OrderMoveRejected orderMoveRejected = 126;
+
+    CancelOrder cancelOrder = 127;
+    OrderCancelled orderCancelled = 128;
+    OrderCancelRejected orderCancelRejected = 129;
+
+    OrderFilled orderFilled = 131;
+    OrderExecuted orderExecuted = 132;
+
+    CancelAll cancelAll = 133;
+
+  }
+}
+
+message OrderBook {
+  string              instrument = 1;
+  string              exchange = 2;
+  int64               timestamp = 3;
+  int64               localTimestamp = 4;
+  repeated LevelInfo  bids = 5;
+  repeated LevelInfo  asks = 6;
+}
+
+message LevelInfo {
+  double price = 1;
+  double size = 2;
+}
+
+message LevelUpdate {
+  string     instrument = 1;
+  string     exchange = 2;
+  string     timestamp = 3;
+  LevelInfo  info = 4;
+}
+
+message OrderBookSnapshot {
+  OrderBook snapshot = 1;
+}
+
+
+message Order {
+  string clientOrderRequestID = 1;
+  string clientAccount = 2;
+  string clientTag = 3;
+  string exchangeID = 4;
+  string PistonClientOrderID = 5;
+  string exchangeClientOrderID = 6;
+  string exchange = 7;
+  string exchangeAccount = 8;
+  OrderSide side = 9;
+  string instrument = 10;
+  OrderType type = 11;
+  double size = 12;
+  double price = 13;
+  double remainingSize = 14;
+  double filled = 15;
+  double volume = 16;
+  double fee = 17;
+  string feeCurrency = 18;
+  int64 created = 19;
+  string tradeID = 20;
+  string market = 21;
+  AggrSide aggrSide = 22;
+  int64 lastUpdated = 23;
+  OrderStatus status = 24;
+  string message = 25;
+}
+
+message InstrumentsDetailsRequest {
+
+}
+
+message InstrumentsDetails {
+  repeated InstrumentDetails instruments_details = 1;
+}
+
+message InstrumentDetails {
+  string instrument = 1;
+  double minLot = 2;
+}
+
+message OpenOrdersRequest {
+  int64 requestID = 1;
+}
+
+message OpenOrdersRequestResult {
+  int64 requestID = 1;
+  repeated OpenOrder orders = 2;
+}
+
+
+message OpenOrder {
+  string exchangeID = 1;
+  string PistonClientOrderID = 2;
+  string exchangeClientOrderID = 3;
+  string exchange = 4;
+  OrderSide side = 5;
+  string instrument = 6;
+  OrderType type = 7;
+  double size = 8;
+  double price = 9;
+  double remainingSize = 10;
+  int64 created = 11;
+  int64 lastUpdated = 12;
+}
+
+message AddOrder {
+  string orderRequestID = 1;
+  string PistonID = 2;
+  string instrument = 3;
+  OrderSide side = 4;
+  OrderType type = 5;
+  double size = 6;
+  double price = 7;
+
+  int64 created = 101;
+}
+
+message OrderAdded {
+  string orderRequestID = 1;
+  string PistonID = 2;
+  string exchange = 3;
+
+  string exchangeID = 4;
+  string exchangeClientOrderID = 5;
+
+  string instrument = 6;
+  OrderSide side = 7;
+  OrderType type = 8;
+  double size = 9;
+  double price = 10;
+
+  int64 lastUpdated = 101;
+}
+
+message OrderAddRejected {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeClientOrderID = 3;
+}
+
+message MoveOrder {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeID = 3;
+  string exchangeClientOrderID = 4;
+  string exchange = 5;
+
+  string instrument = 6;
+  OrderSide side = 7;
+  OrderType type = 8;
+  double size = 9;
+  double price = 10;
+
+  int64 created = 11;
+}
+
+message OrderMoved {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeID = 3;
+  string exchangeClientOrderID = 4;
+  string exchange = 5;
+
+  double size = 6;
+  double price = 7;
+
+  int64 created = 101;
+}
+
+message OrderMoveRejected {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeID = 3;
+  string exchangeClientOrderID = 4;
+}
+
+message CancelOrder {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeID = 3;
+  string exchangeClientOrderID = 4;
+
+  string instrument = 5;
+}
+
+message OrderCancelled {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeID = 3;
+  string exchangeClientOrderID = 4;
+}
+
+message OrderCancelRejected {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeID = 3;
+  string exchangeClientOrderID = 4;
+}
+
+message OrderFilled {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeID = 3;
+  string exchangeClientOrderID = 4;
+  string exchange = 5;
+
+  string tradeID = 6;
+
+  OrderSide side = 7;
+  string instrument = 8;
+  double size = 9;
+  double price = 10;
+
+  double fee = 11;
+  string feeCurrency = 12;
+
+  string market = 13;
+
+  int64 timestamp = 101;
+}
+
+
+message OrderExecuted {
+  string orderRequestID = 1;
+  string PistonID = 2;
+
+  string exchangeID = 3;
+  string exchangeClientOrderID = 4;
+}
+
+
+message CancelAll {}
+
+message ExchangeBalances {
+  string exchange = 1;
+  string exchangeAccount = 2;
+  map<string, double> balances = 3;
+  int64 timestamp = 4;
+}

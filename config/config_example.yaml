@@ -1,0 +1,49 @@
+httpClient:
+  url: "https://www.okx.com"
+  apiKey: ""
+  apiSecret: ""
+  apiPassphrase: ""
+  timeout: 1s
+
+marketDataConfig:
+  url: "wss://ws.okx.com:8443/ws/v5/public"
+  instrumentsToSubscribe:
+    - "BTC-USDT"
+
+userStreamConfig:
+  url: "wss://ws.okx.com:8443/ws/v5/private"
+  apiKey: ""
+  apiSecret: ""
+  apiPassphrase: ""
+
+log:
+  project: "okx"
+  format: "text"
+  level: "debug"
+  env: "local"
+  disableStackTrace: true
+  system: ""
+  inst: ""
+
+postgres:
+  user: "postgres"
+  password: "postgres"
+  host: "127.0.0.1"
+  port: "5432"
+  database: "test"
+  maxConnections: 10
+  maxConnIdletime: "530m0s"
+  maxConnLifetime: "87600h0m0s"
+  healthcheckPeriod: "1m0s"
+
+piston:
+  "localhost:5800"
+
+exchangeAccount:
+  "test_account"
+
+privateAddr:
+  ":9000"
+
+GRPCApiAddr:
+  ":8080"

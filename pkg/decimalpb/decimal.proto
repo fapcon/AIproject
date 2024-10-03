@@ -1,0 +1,19 @@
+syntax = "proto3";
+package decimal;
+
+option go_package = "studentgit.kata.academy/quant/torque/pkg/decimalpb;decimalpb";
+
+// Decimal represents a fixed-point decimal.
+//
+//   number = unscaled / 10 ^ scale
+//
+// Go implementation has a constructor New accepting decimal.Decimal.
+// It also does normalization (trimming trailing zeroes from decimal representation of unscaled):
+//
+//   New(decimal.New(100, 0)) -> {unscaled: 1, scale: -2}
+//
+// Also go implementation has method AsDecimal() returning decimal.Decimal.
+message Decimal {
+  int64 unscaled = 1;
+  int32 scale = 2;
+}
